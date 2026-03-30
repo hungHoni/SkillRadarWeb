@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillRadar / Live</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #f8f9fa;
+    --surface: #ffffff;
+    --border: #e4e7eb;
+    --border-subtle: #f0f1f3;
+    --text-primary: #18181b;
+    --text-secondary: #52525b;
+    --text-muted: #a1a1aa;
+    --accent-green: #059669;
+    --accent-green-bg: #ecfdf5;
+    --accent-blue: #2563eb;
+    --accent-blue-bg: #eff6ff;
+    --accent-orange: #ea580c;
+    --accent-red: #dc2626;
+    --heat-empty: #e4e7eb;
+  }
+
+  body {
+    font-family: 'Outfit', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    min-height: 100dvh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px 40px;
+  }
+
+  /* Header */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0 24px;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+
+  .logo {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: var(--text-primary);
+  }
+
+  .logo-suffix {
+    font-size: 20px;
+    font-weight: 300;
+    color: var(--text-muted);
+    letter-spacing: -0.3px;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .live-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--accent-green);
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
+    animation: pulse 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15); }
+    50% { box-shadow: 0 0 0 6px rgba(5, 150, 105, 0.05); }
+  }
+
+  .live-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 0.2px;
+  }
+
+  /* Domain tabs */
+  .domains {
+    display: flex;
+    gap: 8px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 28px;
+    overflow-x: auto;
+  }
+
+  .domain-tab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 16px;
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    background: var(--surface);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .domain-tab:hover {
+    border-color: #d4d4d8;
+    background: #fafafa;
+  }
+
+  .domain-tab.active {
+    background: var(--text-primary);
+    color: white;
+    border-color: var(--text-primary);
+  }
+
+  .domain-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+
+  .domain-tab.active .domain-count {
+    color: rgba(255,255,255,0.5);
+  }
+
+  /* Main grid */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 28px;
+    align-items: start;
+  }
+
+  /* Cluster cards */
+  .clusters {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .cluster {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .cluster:hover {
+    border-color: #d4d4d8;
+    box-shadow: 0 8px 32px -12px rgba(0,0,0,0.06);
+    transform: translateY(-1px);
+  }
+
+  .cluster-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 14px;
+  }
+
+  .cluster-title {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+    line-height: 1.3;
+    color: var(--text-primary);
+    max-width: 80%;
+  }
+
+  /* Heat bar */
+  .heat {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .heat-bars {
+    display: flex;
+    gap: 3px;
+  }
+
+  .heat-seg {
+    width: 5px;
+    height: 20px;
+    border-radius: 3px;
+    background: var(--heat-empty);
+  }
+
+  .heat-seg.h1 { background: #fbbf24; }
+  .heat-seg.h2 { background: #f97316; }
+  .heat-seg.h3 { background: #ea580c; }
+  .heat-seg.h4 { background: #dc2626; }
+  .heat-seg.h5 { background: #b91c1c; }
+
+  .heat-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+
+  /* Source badges */
+  .sources {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+
+  .source-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    background: var(--bg);
+  }
+
+  .source-badge.on {
+    background: var(--accent-blue-bg);
+    border-color: #bfdbfe;
+    color: var(--accent-blue);
+  }
+
+  .source-badge .dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.5;
+  }
+
+  /* Snippet */
+  .cluster-snippet {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 14px;
+    max-width: 65ch;
+  }
+
+  /* Meta */
+  .cluster-meta {
+    display: flex;
+    gap: 20px;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  .meta-domain {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    background: var(--bg);
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.3px;
+  }
+
+  .meta-mentions {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+  }
+
+  .meta-time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: sticky;
+    top: 24px;
+  }
+
+  .sidebar-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+  }
+
+  .sidebar-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+  }
+
+  /* Rising items */
+  .rising-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .rising-item:last-child { border-bottom: none; }
+
+  .rising-info { display: flex; flex-direction: column; gap: 2px; }
+
+  .rising-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .rising-domain {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .rising-pct {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent-green);
+  }
+
+  /* Source status */
+  .source-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .source-row:last-child { border-bottom: none; }
+
+  .source-status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent-green);
+    flex-shrink: 0;
+  }
+
+  .source-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    flex: 1;
+  }
+
+  .source-time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  /* Keyboard hint bar at bottom */
+  .kbd-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--text-primary);
+    padding: 10px 40px;
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+  }
+
+  .kbd-hint {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+  }
+
+  .kbd {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 2px 6px;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 4px;
+    color: rgba(255,255,255,0.6);
+    background: rgba(255,255,255,0.05);
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <div class="header-left">
+      <span class="logo">SkillRadar</span>
+      <span class="logo-suffix">/ Live</span>
+    </div>
+    <div class="header-right">
+      <span class="live-dot"></span>
+      <span class="live-label">Updated 2 min ago</span>
+    </div>
+  </div>
+
+  <div class="domains">
+    <div class="domain-tab active">All <span class="domain-count">47</span></div>
+    <div class="domain-tab">AI / ML <span class="domain-count">18</span></div>
+    <div class="domain-tab">Backend <span class="domain-count">12</span></div>
+    <div class="domain-tab">Frontend <span class="domain-count">9</span></div>
+    <div class="domain-tab">Cloud / DevOps <span class="domain-count">5</span></div>
+    <div class="domain-tab">System Design <span class="domain-count">3</span></div>
+  </div>
+
+  <div class="main-grid">
+
+    <div class="clusters">
+
+      <!-- Cluster 1 -->
+      <div class="cluster">
+        <div class="cluster-top">
+          <div class="cluster-title">Claude 4 Release & Multi-Agent Architecture</div>
+          <div class="heat">
+            <div class="heat-bars">
+              <div class="heat-seg h4"></div>
+              <div class="heat-seg h3"></div>
+              <div class="heat-seg h2"></div>
+              <div class="heat-seg h1"></div>
+              <div class="heat-seg"></div>
+            </div>
+            <span class="heat-num">4/5</span>
+          </div>
+        </div>
+        <div class="sources">
+          <span class="source-badge on"><span class="dot"></span>Reddit (3 subs)</span>
+          <span class="source-badge on"><span class="dot"></span>HN (12 posts)</span>
+          <span class="source-badge on"><span class="dot"></span>X (trending)</span>
+          <span class="source-badge on"><span class="dot"></span>Anthropic Blog</span>
+        </div>
+        <div class="cluster-snippet">
+          Discussion around Anthropic's latest model release, focusing on multi-agent orchestration capabilities. r/LocalLLaMA comparing benchmarks, HN debating architecture implications for production systems.
+        </div>
+        <div class="cluster-meta">
+          <span class="meta-domain">AI / ML</span>
+          <span class="meta-mentions">127 mentions across 4 sources</span>
+          <span class="meta-time">Trending 3h</span>
+        </div>
+      </div>
+
+      <!-- Cluster 2 -->
+      <div class="cluster">
+        <div class="cluster-top">
+          <div class="cluster-title">Bun 2.0 vs Deno -- Runtime Wars Heat Up</div>
+          <div class="heat">
+            <div class="heat-bars">
+              <div class="heat-seg h3"></div>
+              <div class="heat-seg h2"></div>
+              <div class="heat-seg h1"></div>
+              <div class="heat-seg"></div>
+              <div class="heat-seg"></div>
+            </div>
+            <span class="heat-num">3/5</span>
+          </div>
+        </div>
+        <div class="sources">
+          <span class="source-badge on"><span class="dot"></span>Reddit (2 subs)</span>
+          <span class="source-badge on"><span class="dot"></span>HN (8 posts)</span>
+          <span class="source-badge"><span class="dot"></span>X</span>
+          <span class="source-badge"><span class="dot"></span>Blogs</span>
+        </div>
+        <div class="cluster-snippet">
+          Bun 2.0 dropped with native S3 support and a rewritten bundler. Comparisons with Deno flooding r/javascript and HN front page. Key interview topic: "Why would you choose Bun over Node?"
+        </div>
+        <div class="cluster-meta">
+          <span class="meta-domain">Backend / Frontend</span>
+          <span class="meta-mentions">84 mentions across 2 sources</span>
+          <span class="meta-time">Trending 6h</span>
+        </div>
+      </div>
+
+      <!-- Cluster 3 -->
+      <div class="cluster">
+        <div class="cluster-top">
+          <div class="cluster-title">Framer Motion Alternatives for React Server Components</div>
+          <div class="heat">
+            <div class="heat-bars">
+              <div class="heat-seg h2"></div>
+              <div class="heat-seg h1"></div>
+              <div class="heat-seg"></div>
+              <div class="heat-seg"></div>
+              <div class="heat-seg"></div>
+            </div>
+            <span class="heat-num">2/5</span>
+          </div>
+        </div>
+        <div class="sources">
+          <span class="source-badge on"><span class="dot"></span>Reddit (1 sub)</span>
+          <span class="source-badge on"><span class="dot"></span>HN (3 posts)</span>
+          <span class="source-badge"><span class="dot"></span>X</span>
+          <span class="source-badge"><span class="dot"></span>Blogs</span>
+        </div>
+        <div class="cluster-snippet">
+          With RSC adoption growing, developers discussing lightweight animation libraries that work without client-side JS. CSS-only motion patterns gaining traction in r/reactjs.
+        </div>
+        <div class="cluster-meta">
+          <span class="meta-domain">Frontend / UI</span>
+          <span class="meta-mentions">31 mentions across 2 sources</span>
+          <span class="meta-time">Trending 12h</span>
+        </div>
+      </div>
+
+      <!-- Cluster 4 -->
+      <div class="cluster">
+        <div class="cluster-top">
+          <div class="cluster-title">PostgreSQL 18 Logical Replication & Horizontal Scaling</div>
+          <div class="heat">
+            <div class="heat-bars">
+              <div class="heat-seg h2"></div>
+              <div class="heat-seg h1"></div>
+              <div class="heat-seg"></div>
+              <div class="heat-seg"></div>
+              <div class="heat-seg"></div>
+            </div>
+            <span class="heat-num">2/5</span>
+          </div>
+        </div>
+        <div class="sources">
+          <span class="source-badge on"><span class="dot"></span>Reddit (2 subs)</span>
+          <span class="source-badge on"><span class="dot"></span>HN (5 posts)</span>
+          <span class="source-badge"><span class="dot"></span>X</span>
+          <span class="source-badge on"><span class="dot"></span>PG Blog</span>
+        </div>
+        <div class="cluster-snippet">
+          PostgreSQL 18 beta introduces native horizontal scaling via logical replication improvements. r/database and HN comparing with CockroachDB and Vitess. System design interview goldmine.
+        </div>
+        <div class="cluster-meta">
+          <span class="meta-domain">Backend / System Design</span>
+          <span class="meta-mentions">52 mentions across 3 sources</span>
+          <span class="meta-time">Trending 8h</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="sidebar">
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Rising Fast</div>
+        <div class="rising-item">
+          <div class="rising-info">
+            <span class="rising-name">Edge Functions at Scale</span>
+            <span class="rising-domain">Cloud / DevOps</span>
+          </div>
+          <span class="rising-pct">+340%</span>
+        </div>
+        <div class="rising-item">
+          <div class="rising-info">
+            <span class="rising-name">SQL vs NoSQL in 2026</span>
+            <span class="rising-domain">System Design</span>
+          </div>
+          <span class="rising-pct">+180%</span>
+        </div>
+        <div class="rising-item">
+          <div class="rising-info">
+            <span class="rising-name">View Transitions API</span>
+            <span class="rising-domain">Frontend</span>
+          </div>
+          <span class="rising-pct">+120%</span>
+        </div>
+        <div class="rising-item">
+          <div class="rising-info">
+            <span class="rising-name">gRPC vs REST debate</span>
+            <span class="rising-domain">Backend</span>
+          </div>
+          <span class="rising-pct">+95%</span>
+        </div>
+        <div class="rising-item">
+          <div class="rising-info">
+            <span class="rising-name">Kubernetes Alternatives</span>
+            <span class="rising-domain">Cloud / DevOps</span>
+          </div>
+          <span class="rising-pct">+78%</span>
+        </div>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Sources</div>
+        <div class="source-row">
+          <span class="source-status-dot"></span>
+          <span class="source-name">Reddit API</span>
+          <span class="source-time">2m ago</span>
+        </div>
+        <div class="source-row">
+          <span class="source-status-dot"></span>
+          <span class="source-name">Hacker News</span>
+          <span class="source-time">1m ago</span>
+        </div>
+        <div class="source-row">
+          <span class="source-status-dot"></span>
+          <span class="source-name">X / Twitter</span>
+          <span class="source-time">5m ago</span>
+        </div>
+        <div class="source-row">
+          <span class="source-status-dot"></span>
+          <span class="source-name">AI Company Blogs</span>
+          <span class="source-time">15m ago</span>
+        </div>
+        <div class="source-row">
+          <span class="source-status-dot"></span>
+          <span class="source-name">Dev Blogs (RSS)</span>
+          <span class="source-time">12m ago</span>
+        </div>
+      </div>
+
+      <div class="sidebar-card" style="background: var(--text-primary); border-color: var(--text-primary);">
+        <div class="sidebar-title" style="color: rgba(255,255,255,0.35);">Your Domains</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+          <span style="font-size: 12px; font-weight: 500; padding: 4px 12px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.05);">AI / ML</span>
+          <span style="font-size: 12px; font-weight: 500; padding: 4px 12px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.05);">Backend</span>
+          <span style="font-size: 12px; font-weight: 500; padding: 4px 12px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.05);">Frontend</span>
+          <span style="font-size: 12px; font-weight: 500; padding: 4px 12px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.05);">System Design</span>
+          <span style="font-size: 12px; font-weight: 500; padding: 4px 12px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.3);">+ Add domain</span>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="kbd-bar">
+  <span class="kbd-hint"><span class="kbd">F</span> Filter</span>
+  <span class="kbd-hint"><span class="kbd">J/K</span> Navigate</span>
+  <span class="kbd-hint"><span class="kbd">Enter</span> Expand</span>
+  <span class="kbd-hint"><span class="kbd">S</span> Save topic</span>
+  <span class="kbd-hint"><span class="kbd">R</span> Refresh</span>
+</div>
+
+</body>
+</html>

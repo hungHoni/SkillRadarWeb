@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+@theme {
+	/* Typography */
+	--font-display: "Outfit", sans-serif;
+	--font-mono: "JetBrains Mono", monospace;
+
+	/* Colors */
+	--color-bg-page: #fafafa;
+	--color-bg-card: #ffffff;
+	--color-bg-sidebar: #f4f4f5;
+	--color-text-primary: #18181b;
+	--color-text-secondary: #71717a;
+	--color-text-muted: #a1a1aa;
+	--color-accent: #10b981;
+	--color-accent-light: #d1fae5;
+	--color-border: #e4e4e7;
+
+	/* Heat colors */
+	--color-heat-1: #e4e4e7;
+	--color-heat-2: #fbbf24;
+	--color-heat-3: #f97316;
+	--color-heat-4: #ef4444;
+	--color-heat-5: #dc2626;
+
+	/* Source colors */
+	--color-source-reddit: #ff4500;
+	--color-source-hn: #ff6600;
+	--color-source-rss: #3b82f6;
+
+	/* Spacing */
+	--spacing-xs: 0.25rem;
+	--spacing-sm: 0.5rem;
+	--spacing-md: 1rem;
+	--spacing-lg: 1.5rem;
+	--spacing-xl: 2rem;
+	--spacing-2xl: 3rem;
+
+	/* Radius */
+	--radius-sm: 0.375rem;
+	--radius-md: 0.5rem;
+	--radius-lg: 0.75rem;
+}
+
+body {
+	font-family: var(--font-display);
+	background-color: var(--color-bg-page);
+	color: var(--color-text-primary);
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+	}
+}

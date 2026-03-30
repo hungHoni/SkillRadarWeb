@@ -1,0 +1,22 @@
+{
+	"name": "skillradar",
+	"version": "0.1.0",
+	"private": true,
+	"workspaces": ["server", "client", "shared"],
+	"scripts": {
+		"dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+		"dev:server": "npm run dev -w server",
+		"dev:client": "npm run dev -w client",
+		"build": "npm run build -w shared && npm run build -w server && npm run build -w client",
+		"test": "npm run test -w server",
+		"lint": "biome check .",
+		"lint:fix": "biome check --write .",
+		"format": "biome format --write .",
+		"typecheck": "tsc --noEmit -p server/tsconfig.json && tsc --noEmit -p client/tsconfig.json"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^1.9.0",
+		"concurrently": "^9.1.0",
+		"typescript": "^5.7.0"
+	}
+}
