@@ -54,9 +54,13 @@ export async function processPosts(posts: RawPost[]): Promise<void> {
 
 	// Step 3: Generate embeddings in batch
 	const texts = taggedPosts.map((p) => `${p.title} ${p.snippet || ''}`);
+	console.log(`[Engine] Generating embeddings for ${texts.length} posts...`);
 	const embeddings = await generateEmbeddings(texts);
+	const successCount = embeddings.filter((e) => e !== null).length;
+	console.log(`[Engine] Embeddings: ${successCount}/${texts.length} succeeded`);
 
 	// Step 4: Insert posts with embeddings and cluster them
+	let inserted = 0;
 	for (let i = 0; i < taggedPosts.length; i++) {
 		const post = taggedPosts[i];
 		const embedding = embeddings[i];
@@ -87,6 +91,7 @@ export async function processPosts(posts: RawPost[]): Promise<void> {
 		);
 
 		if (insertResult.rows.length === 0) continue;
+		inserted++;
 		const postId = insertResult.rows[0].id;
 
 		// Step 5: Find nearest cluster centroid
@@ -181,6 +186,7 @@ export async function processPosts(posts: RawPost[]): Promise<void> {
 			});
 		}
 	}
+	console.log(`[Engine] Inserted ${inserted}/${taggedPosts.length} posts`);
 }
 
 /**
