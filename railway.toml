@@ -7,7 +7,7 @@ nixPkgs = ["nodejs_20", "npm"]
 aptPkgs = []
 
 [deploy]
-startCommand = "node server/dist/db/migrate.js && node server/dist/index.js"
+startCommand = "node server/dist/db/migrate.js; node server/dist/index.js"
 healthcheckPath = "/health"
 healthcheckTimeout = 30
 restartPolicyType = "ON_FAILURE"

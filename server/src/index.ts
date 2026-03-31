@@ -9,6 +9,8 @@ import { trendsRoutes } from './routes/trends.js';
 import { startScheduler } from './scrapers/scheduler.js';
 import { sseRoutes } from './sse/broadcast.js';
 
+let dbReady = false;
+
 const app = Fastify({
 	logger: {
 		level: 'info',
@@ -26,23 +28,29 @@ await app.register(risingRoutes, { prefix: '/api' });
 await app.register(sourcesRoutes, { prefix: '/api' });
 await app.register(sseRoutes, { prefix: '/api' });
 
-// Health check
-app.get('/health', async () => ({ status: 'ok' }));
+// Health check — responds even if DB isn't ready yet
+app.get('/health', async () => ({ status: 'ok', db: dbReady }));
 
 async function start() {
+	// Start listening FIRST so healthcheck passes
+	await app.listen({ port: config.port, host: '0.0.0.0' });
+	console.log(`Server listening on port ${config.port}`);
+
+	// Then connect DB and start scrapers
 	try {
 		await initDb();
-		app.log.info('Database connected');
+		dbReady = true;
+		console.log('Database connected');
 
 		startScheduler();
-		app.log.info('Scrapers scheduled');
-
-		await app.listen({ port: config.port, host: '0.0.0.0' });
-		app.log.info(`Server running on port ${config.port}`);
+		console.log('Scrapers scheduled');
 	} catch (err) {
-		app.log.error(err);
-		process.exit(1);
+		console.error('Database/scheduler init failed:', err);
+		// Don't exit — server stays up for healthcheck, can retry DB later
 	}
 }
 
-start();
+start().catch((err) => {
+	console.error('Server failed to start:', err);
+	process.exit(1);
+});
