@@ -11,7 +11,7 @@ import { sseRoutes } from './sse/broadcast.js';
 
 const app = Fastify({
 	logger: {
-		level: config.nodeEnv === 'development' ? 'info' : 'warn',
+		level: 'info',
 	},
 });
 

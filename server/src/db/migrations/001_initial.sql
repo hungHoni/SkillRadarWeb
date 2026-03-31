@@ -52,8 +52,7 @@ CREATE TABLE IF NOT EXISTS source_health (
   last_scraped_at TIMESTAMPTZ
 );
 
--- Indexes
-CREATE INDEX IF NOT EXISTS idx_posts_embedding ON posts USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
+-- Indexes (IVFFlat requires data to build — created later via 002_ivfflat_index.sql)
 CREATE INDEX IF NOT EXISTS idx_clusters_heat ON clusters (heat_score DESC) WHERE is_active = TRUE;
 CREATE INDEX IF NOT EXISTS idx_posts_scraped ON posts (scraped_at DESC);
 CREATE INDEX IF NOT EXISTS idx_posts_url ON posts (url) WHERE url IS NOT NULL;
