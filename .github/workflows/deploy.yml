@@ -27,8 +27,11 @@ jobs:
 
       - run: npm ci
 
+      - name: Build shared types
+        run: npm run build -w shared
+
       - name: Build client
-        run: cd client && npx vite build
+        run: npm run build -w client
         env:
           VITE_API_URL: 'https://web-production-c73e96.up.railway.app'
           GITHUB_PAGES: 'true'
