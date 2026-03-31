@@ -6,7 +6,7 @@ import type {
 	SourceHealth,
 } from '@skillradar/shared';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { fetchRising, fetchSourcesHealth, fetchTrends } from './api/client';
+import { fetchRising, fetchSourcesHealth, fetchTrends, triggerScrape } from './api/client';
 import { ClusterCard } from './components/ClusterCard';
 import { DomainTabs } from './components/DomainTabs';
 import { Header } from './components/Header';
@@ -81,6 +81,11 @@ export function App() {
 
 	useEffect(() => {
 		loadData();
+	}, [loadData]);
+
+	const handleRefresh = useCallback(async () => {
+		await triggerScrape();
+		await loadData();
 	}, [loadData]);
 
 	// SSE handler
@@ -234,7 +239,7 @@ export function App() {
 
 	return (
 		<div className="flex min-h-[100dvh] flex-col bg-[var(--color-bg-page)]">
-			<Header connected={connected} lastUpdated={lastUpdated} />
+			<Header connected={connected} lastUpdated={lastUpdated} onRefresh={handleRefresh} />
 
 			{allSourcesDown && (
 				<div className="border-b border-[var(--color-heat-2)] bg-[var(--color-heat-2)]/10 px-6 py-2 text-center text-sm font-medium text-[var(--color-heat-3)]">

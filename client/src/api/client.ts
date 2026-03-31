@@ -36,3 +36,21 @@ export function fetchSourcesHealth(): Promise<SourcesHealthResponse> {
 	if (USE_MOCK) return mockFetchSourcesHealth();
 	return fetchJSON('/sources/health');
 }
+
+export interface ScrapeResult {
+	source: string;
+	status: 'success' | 'failed';
+	error?: string;
+}
+
+export interface ScrapeResponse {
+	results: ScrapeResult[];
+}
+
+export async function triggerScrape(): Promise<ScrapeResponse> {
+	const response = await fetch(`${API_BASE}/scrape`, { method: 'POST' });
+	if (!response.ok && response.status !== 207) {
+		throw new Error(`API error: ${response.status} ${response.statusText}`);
+	}
+	return response.json() as Promise<ScrapeResponse>;
+}

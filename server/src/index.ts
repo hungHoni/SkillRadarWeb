@@ -5,6 +5,7 @@ import { initDb } from './db/client.js';
 import { clustersRoutes } from './routes/clusters.js';
 import { risingRoutes } from './routes/rising.js';
 import { sourcesRoutes } from './routes/sources.js';
+import { scrapeRoutes } from './routes/scrape.js';
 import { trendsRoutes } from './routes/trends.js';
 import { startScheduler } from './scrapers/scheduler.js';
 import { sseRoutes } from './sse/broadcast.js';
@@ -26,6 +27,7 @@ await app.register(trendsRoutes, { prefix: '/api' });
 await app.register(clustersRoutes, { prefix: '/api' });
 await app.register(risingRoutes, { prefix: '/api' });
 await app.register(sourcesRoutes, { prefix: '/api' });
+await app.register(scrapeRoutes, { prefix: '/api' });
 await app.register(sseRoutes, { prefix: '/api' });
 
 // Health check — responds even if DB isn't ready yet

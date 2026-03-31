@@ -1,5 +1,6 @@
 import type { SSEEvent } from '@skillradar/shared';
 import type { FastifyPluginAsync, FastifyReply } from 'fastify';
+import { config } from '../config.js';
 
 interface SSEClient {
 	id: string;
@@ -10,6 +11,15 @@ const clients: SSEClient[] = [];
 const eventBuffer: { id: number; event: SSEEvent }[] = [];
 let eventCounter = 0;
 const MAX_BUFFER_SIZE = 100;
+
+function getCorsOrigin(requestOrigin: string | undefined): string | null {
+	const allowed = config.corsOrigin;
+	if (allowed === true) return requestOrigin || '*';
+	if (allowed === false || !allowed) return null;
+	if (typeof allowed === 'string') return allowed;
+	if (Array.isArray(allowed) && requestOrigin && allowed.includes(requestOrigin)) return requestOrigin;
+	return null;
+}
 
 export function broadcast(event: SSEEvent): void {
 	eventCounter++;
@@ -34,12 +44,22 @@ export function broadcast(event: SSEEvent): void {
 
 export const sseRoutes: FastifyPluginAsync = async (app) => {
 	app.get('/sse/stream', async (request, reply) => {
-		reply.raw.writeHead(200, {
+		const origin = request.headers.origin;
+		const corsOrigin = getCorsOrigin(origin);
+
+		const headers: Record<string, string> = {
 			'Content-Type': 'text/event-stream',
 			'Cache-Control': 'no-cache',
 			Connection: 'keep-alive',
 			'X-Accel-Buffering': 'no',
-		});
+		};
+
+		if (corsOrigin) {
+			headers['Access-Control-Allow-Origin'] = corsOrigin;
+			headers['Access-Control-Allow-Credentials'] = 'true';
+		}
+
+		reply.raw.writeHead(200, headers);
 
 		const clientId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 		const client: SSEClient = { id: clientId, reply };
