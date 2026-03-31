@@ -117,17 +117,25 @@ export async function scrapeHN(): Promise<void> {
 	}));
 
 	if (posts.length > 0) {
-		await processPosts(posts);
+		const inserted = await processPosts(posts);
+		console.log(`[HN] ${inserted}/${posts.length} posts actually inserted into DB`);
 
-		const maxId = Math.max(...items.map((i) => i.id));
-		await query(
-			`INSERT INTO source_health (source, last_scrape, status, last_scraped_id, error_count)
-			 VALUES ('hn', NOW(), 'healthy', $1, 0)
-			 ON CONFLICT (source) DO UPDATE SET
-				last_scrape = NOW(), status = 'healthy',
-				last_scraped_id = $1, error_count = 0`,
-			[String(maxId)],
-		);
+		// Only advance high-water mark if posts were actually inserted
+		if (inserted > 0) {
+			const maxId = Math.max(...items.map((i) => i.id));
+			await query(
+				`INSERT INTO source_health (source, last_scrape, status, last_scraped_id, error_count)
+				 VALUES ('hn', NOW(), 'healthy', $1, 0)
+				 ON CONFLICT (source) DO UPDATE SET
+					last_scrape = NOW(), status = 'healthy',
+					last_scraped_id = $1, error_count = 0`,
+				[String(maxId)],
+			);
+		} else {
+			console.warn('[HN] 0 posts inserted — NOT advancing high-water mark. Check OpenAI API key.');
+			await updateSourceHealth('degraded');
+			return;
+		}
 	}
 
 	await updateSourceHealth('healthy');

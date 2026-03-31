@@ -87,8 +87,8 @@ export async function scrapeRSS(): Promise<void> {
 				}));
 
 			if (posts.length > 0) {
-				await processPosts(posts);
-				totalPosts += posts.length;
+				const inserted = await processPosts(posts);
+				totalPosts += inserted;
 			}
 		} catch (err) {
 			errorCount++;

@@ -25,8 +25,8 @@ interface RawPost {
  * Process a batch of new posts: check URL dedup, generate embeddings,
  * assign to clusters or create new ones, update heat scores.
  */
-export async function processPosts(posts: RawPost[]): Promise<void> {
-	if (posts.length === 0) return;
+export async function processPosts(posts: RawPost[]): Promise<number> {
+	if (posts.length === 0) return 0;
 
 	// Step 1: URL dedup — skip posts whose URL already exists
 	const postsToEmbed: RawPost[] = [];
@@ -44,7 +44,7 @@ export async function processPosts(posts: RawPost[]): Promise<void> {
 		postsToEmbed.push(post);
 	}
 
-	if (postsToEmbed.length === 0) return;
+	if (postsToEmbed.length === 0) return 0;
 
 	// Step 2: Domain tagging
 	const taggedPosts = postsToEmbed.map((post) => ({
@@ -187,6 +187,7 @@ export async function processPosts(posts: RawPost[]): Promise<void> {
 		}
 	}
 	console.log(`[Engine] Inserted ${inserted}/${taggedPosts.length} posts`);
+	return inserted;
 }
 
 /**

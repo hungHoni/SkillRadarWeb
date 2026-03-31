@@ -110,17 +110,21 @@ async function fetchSubreddit(subreddit: string): Promise<void> {
 	}));
 
 	if (posts.length > 0) {
-		await processPosts(posts);
+		const inserted = await processPosts(posts);
 
-		// Update high-water mark
-		await query(
-			`INSERT INTO source_health (source, last_scrape, status, last_scraped_id)
-			 VALUES ('reddit', NOW(), 'healthy', $1)
-			 ON CONFLICT (source) DO UPDATE SET
-				last_scrape = NOW(), status = 'healthy',
-				last_scraped_id = $1, error_count = 0`,
-			[posts[posts.length - 1].source_id],
-		);
+		// Only advance high-water mark if posts were actually inserted
+		if (inserted > 0) {
+			await query(
+				`INSERT INTO source_health (source, last_scrape, status, last_scraped_id)
+				 VALUES ('reddit', NOW(), 'healthy', $1)
+				 ON CONFLICT (source) DO UPDATE SET
+					last_scrape = NOW(), status = 'healthy',
+					last_scraped_id = $1, error_count = 0`,
+				[posts[posts.length - 1].source_id],
+			);
+		} else {
+			console.warn(`[Reddit] 0 posts inserted from r/${subreddit} — check OpenAI API key`);
+		}
 	}
 }
 
