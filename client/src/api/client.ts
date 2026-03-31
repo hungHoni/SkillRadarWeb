@@ -6,7 +6,7 @@ import type {
 } from '@skillradar/shared';
 import { mockFetchCluster, mockFetchRising, mockFetchSourcesHealth, mockFetchTrends } from './mock';
 
-const API_BASE = '/api';
+const API_BASE = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : '/api';
 const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true';
 
 async function fetchJSON<T>(path: string): Promise<T> {

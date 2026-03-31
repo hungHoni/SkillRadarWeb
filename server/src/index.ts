@@ -16,7 +16,7 @@ const app = Fastify({
 });
 
 await app.register(cors, {
-	origin: config.nodeEnv === 'development',
+	origin: config.corsOrigin,
 });
 
 // Routes

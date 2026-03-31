@@ -14,8 +14,9 @@ export function useSSE({ onEvent }: UseSSEOptions) {
 	onEventRef.current = onEvent;
 
 	const connect = useCallback(() => {
-		const url = new URL('/api/sse/stream', window.location.origin);
-		const es = new EventSource(url.toString());
+		const base = import.meta.env.VITE_API_URL || window.location.origin;
+		const url = `${base}/api/sse/stream`;
+		const es = new EventSource(url);
 		eventSourceRef.current = es;
 
 		es.addEventListener('connected', () => {
