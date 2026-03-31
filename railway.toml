@@ -2,6 +2,9 @@
 builder = "NIXPACKS"
 buildCommand = "npm ci && npm run build -w shared && npm run build -w server"
 
+[build.nixpacks]
+nixPkgs = ["nodejs_20", "npm"]
+
 [deploy]
 startCommand = "node server/dist/db/migrate.js && node server/dist/index.js"
 healthcheckPath = "/health"
