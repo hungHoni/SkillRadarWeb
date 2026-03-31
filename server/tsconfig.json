@@ -2,11 +2,12 @@
 	"extends": "../tsconfig.json",
 	"compilerOptions": {
 		"outDir": "./dist",
+		"rootDir": "./src",
 		"module": "ESNext",
 		"moduleResolution": "bundler",
 		"paths": {
-			"@skillradar/shared": ["../shared/src/types.ts"]
+			"@skillradar/shared": ["../shared/dist/types.d.ts"]
 		}
 	},
-	"include": ["src/**/*", "../shared/src/**/*"]
+	"include": ["src/**/*"]
 }
