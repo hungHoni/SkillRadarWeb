@@ -48,7 +48,7 @@ export interface ScrapeResponse {
 }
 
 export async function triggerScrape(): Promise<ScrapeResponse> {
-	const response = await fetch(`${API_BASE}/scrape`, { method: 'POST' });
+	const response = await fetch(`${API_BASE}/scrape?reset=true`, { method: 'POST' });
 	if (!response.ok && response.status !== 207) {
 		throw new Error(`API error: ${response.status} ${response.statusText}`);
 	}

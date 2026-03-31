@@ -1,4 +1,5 @@
 import type { FastifyPluginAsync } from 'fastify';
+import { query } from '../db/client.js';
 import { scrapeHN } from '../scrapers/hn.js';
 import { scrapeRSS } from '../scrapers/rss.js';
 import { scrapeReddit } from '../scrapers/reddit.js';
@@ -10,7 +11,17 @@ interface ScrapeResult {
 }
 
 export const scrapeRoutes: FastifyPluginAsync = async (app) => {
-	app.post('/scrape', async (_request, reply) => {
+	app.post('/scrape', async (request, reply) => {
+		const { reset } = (request.query as { reset?: string }) || {};
+
+		// Reset high-water marks so scrapers re-fetch everything
+		if (reset === 'true') {
+			console.log('[Scrape] Resetting high-water marks...');
+			await query(
+				"UPDATE source_health SET last_scraped_id = NULL, last_scraped_at = NULL WHERE source IN ('hn', 'reddit', 'rss')",
+			);
+		}
+
 		const scrapers = [
 			{ name: 'hn', fn: scrapeHN },
 			{ name: 'rss', fn: scrapeRSS },

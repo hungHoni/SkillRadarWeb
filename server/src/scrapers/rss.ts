@@ -6,24 +6,20 @@ import { broadcast } from '../sse/broadcast.js';
 const parser = new Parser({ timeout: 10_000 });
 
 const RSS_FEEDS = [
-	'https://blog.openai.com/rss/',
-	'https://ai.googleblog.com/feeds/posts/default?alt=rss',
+	'https://openai.com/blog/rss.xml',
+	'https://blog.google/technology/ai/rss/',
 	'https://engineering.fb.com/feed/',
 	'https://netflixtechblog.com/feed',
 	'https://blog.cloudflare.com/rss/',
 	'https://aws.amazon.com/blogs/aws/feed/',
-	'https://devblogs.microsoft.com/engineering-at-microsoft/feed/',
 	'https://github.blog/feed/',
 	'https://vercel.com/blog/rss.xml',
-	'https://www.docker.com/blog/feed/',
 	'https://kubernetes.io/feed.xml',
 	'https://martinfowler.com/feed.atom',
 	'https://overreacted.io/rss.xml',
-	'https://kentcdodds.com/blog/rss.xml',
 	'https://jvns.ca/atom.xml',
 	'https://simonwillison.net/atom/everything/',
 	'https://lilianweng.github.io/index.xml',
-	'https://karpathy.github.io/feed.xml',
 	'https://newsletter.pragmaticengineer.com/feed',
 	'https://blog.bytebytego.com/feed',
 ];
