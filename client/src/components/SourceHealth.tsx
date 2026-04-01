@@ -6,7 +6,6 @@ interface SourceHealthProps {
 }
 
 const SOURCE_LABELS: Record<string, string> = {
-	reddit: 'Reddit API',
 	hn: 'Hacker News',
 	rss: 'RSS Feeds',
 };

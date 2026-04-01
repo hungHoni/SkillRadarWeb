@@ -112,7 +112,6 @@ export async function scrapeHN(): Promise<void> {
 		author: item.by || null,
 		score: item.score || 0,
 		comment_count: item.descendants || 0,
-		subreddit: null,
 		created_at: new Date(item.time * 1000).toISOString(),
 	}));
 

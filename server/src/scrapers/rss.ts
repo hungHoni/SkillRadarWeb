@@ -5,24 +5,70 @@ import { broadcast } from '../sse/broadcast.js';
 
 const parser = new Parser({ timeout: 10_000 });
 
-const RSS_FEEDS = [
+/** Tech engineering blogs and aggregators */
+const TECH_FEEDS = [
+	// AI / ML
 	'https://openai.com/blog/rss.xml',
 	'https://blog.google/technology/ai/rss/',
+	'https://lilianweng.github.io/index.xml',
+
+	// Big Tech Engineering
 	'https://engineering.fb.com/feed/',
 	'https://netflixtechblog.com/feed',
 	'https://blog.cloudflare.com/rss/',
 	'https://aws.amazon.com/blogs/aws/feed/',
 	'https://github.blog/feed/',
+	'https://engineering.atspotify.com/feed/',
+	'https://eng.uber.com/feed/',
+	'https://dropbox.tech/feed',
+	'https://medium.com/feed/airbnb-engineering',
+	'https://blog.twitter.com/engineering/en_us/blog.rss',
+	'https://slack.engineering/feed/',
+	'https://engineering.linkedin.com/blog.rss',
+	'https://stripe.com/blog/feed.rss',
+
+	// Platforms & Tools
 	'https://vercel.com/blog/rss.xml',
 	'https://kubernetes.io/feed.xml',
+	'https://blog.rust-lang.org/feed.xml',
+	'https://go.dev/blog/feed.atom',
+	'https://devblogs.microsoft.com/typescript/feed/',
+	'https://bun.sh/blog/rss.xml',
+	'https://deno.com/feed',
+
+	// Influential Individuals
 	'https://martinfowler.com/feed.atom',
 	'https://overreacted.io/rss.xml',
 	'https://jvns.ca/atom.xml',
 	'https://simonwillison.net/atom/everything/',
-	'https://lilianweng.github.io/index.xml',
 	'https://newsletter.pragmaticengineer.com/feed',
 	'https://blog.bytebytego.com/feed',
+
+	// Tech News & Aggregators
+	'https://techcrunch.com/feed/',
+	'https://www.theverge.com/rss/index.xml',
+	'https://feeds.arstechnica.com/arstechnica/index',
+	'https://www.wired.com/feed/rss',
+	'https://thenewstack.io/feed/',
+	'https://www.infoq.com/feed/',
 ];
+
+/** World news feeds for breaking_news domain */
+const NEWS_FEEDS = [
+	'https://feeds.bbci.co.uk/news/world/rss.xml',
+	'https://feeds.bbci.co.uk/news/technology/rss.xml',
+	'https://rss.nytimes.com/services/xml/rss/nyt/World.xml',
+	'https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml',
+	'https://feeds.reuters.com/reuters/topNews',
+	'https://feeds.reuters.com/reuters/technologyNews',
+	'https://www.aljazeera.com/xml/rss/all.xml',
+	'https://www.theguardian.com/world/rss',
+	'https://apnews.com/apf-topnews/feed',
+	'https://www.cnbc.com/id/100003114/device/rss/rss.html',
+	'https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en',
+];
+
+const ALL_FEEDS = [...TECH_FEEDS, ...NEWS_FEEDS];
 
 async function updateSourceHealth(status: string): Promise<void> {
 	await query(
@@ -56,7 +102,7 @@ export async function scrapeRSS(): Promise<void> {
 		? new Date(hwResult.rows[0].last_scraped_at)
 		: new Date(0);
 
-	for (const feedUrl of RSS_FEEDS) {
+	for (const feedUrl of ALL_FEEDS) {
 		try {
 			const feed = await parser.parseURL(feedUrl);
 
@@ -76,7 +122,6 @@ export async function scrapeRSS(): Promise<void> {
 					author: item.creator || item['dc:creator'] || null,
 					score: 0,
 					comment_count: 0,
-					subreddit: null,
 					created_at: item.pubDate
 						? new Date(item.pubDate).toISOString()
 						: new Date().toISOString(),
@@ -92,7 +137,7 @@ export async function scrapeRSS(): Promise<void> {
 		}
 	}
 
-	if (errorCount >= RSS_FEEDS.length) {
+	if (errorCount >= ALL_FEEDS.length) {
 		await updateSourceHealth('down');
 	} else {
 		await query(
@@ -105,6 +150,6 @@ export async function scrapeRSS(): Promise<void> {
 	}
 
 	console.log(
-		`[RSS] Scrape complete. ${totalPosts} posts from ${RSS_FEEDS.length - errorCount} feeds.`,
+		`[RSS] Scrape complete. ${totalPosts} posts from ${ALL_FEEDS.length - errorCount} feeds.`,
 	);
 }

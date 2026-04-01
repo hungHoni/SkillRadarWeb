@@ -20,10 +20,4 @@ export const config = {
 	openai: {
 		apiKey: process.env.OPENAI_API_KEY || '',
 	},
-
-	reddit: {
-		clientId: process.env.REDDIT_CLIENT_ID || '',
-		clientSecret: process.env.REDDIT_CLIENT_SECRET || '',
-		userAgent: process.env.REDDIT_USER_AGENT || 'SkillRadar/0.1.0',
-	},
 } as const;

@@ -9,6 +9,7 @@ interface DomainTabsProps {
 
 const DOMAINS: (DomainTag | 'all')[] = [
 	'all',
+	'breaking_news',
 	'ai_ml',
 	'backend',
 	'frontend',

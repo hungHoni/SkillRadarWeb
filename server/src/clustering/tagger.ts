@@ -1,44 +1,14 @@
 import type { DomainTag } from '@skillradar/shared';
 
 /**
- * Subreddit → domain tag mapping.
- */
-const SUBREDDIT_MAP: Record<string, DomainTag> = {
-	machinelearning: 'ai_ml',
-	localllama: 'ai_ml',
-	artificial: 'ai_ml',
-	deeplearning: 'ai_ml',
-	languagetechnology: 'ai_ml',
-	javascript: 'frontend',
-	reactjs: 'frontend',
-	webdev: 'frontend',
-	css: 'frontend',
-	frontend: 'frontend',
-	nextjs: 'frontend',
-	sveltejs: 'frontend',
-	vuejs: 'frontend',
-	node: 'backend',
-	golang: 'backend',
-	rust: 'backend',
-	python: 'backend',
-	java: 'backend',
-	programming: 'backend',
-	softwaredevelopment: 'backend',
-	devops: 'cloud_devops',
-	kubernetes: 'cloud_devops',
-	docker: 'cloud_devops',
-	aws: 'cloud_devops',
-	googlecloud: 'cloud_devops',
-	terraform: 'cloud_devops',
-	systemdesign: 'system_design',
-	cscareerquestions: 'system_design',
-	experienceddevs: 'system_design',
-};
-
-/**
- * Keyword sets for each domain (used for HN + RSS tagging).
+ * Keyword sets for each domain.
+ * Order matters: first match with highest score wins.
  */
 const KEYWORD_MAP: [DomainTag, RegExp][] = [
+	[
+		'breaking_news',
+		/\b(breaking|election|president|congress|senate|parliament|war|conflict|ceasefire|earthquake|hurricane|flood|wildfire|tsunami|pandemic|vaccine|outbreak|economy|recession|inflation|stock market|fed rate|trade war|sanctions|protest|riot|coup|assassination|hostage|missile|nuclear|climate summit|G7|G20|NATO|UN resolution|evacuation|emergency|disaster|terror|explosion|supreme court|ruling|impeach|indictment|border|refugee|famine|government shutdown|executive order|mass shooting|crash landing|political|legislation|ballot|voter|geopolitical)\b/i,
+	],
 	[
 		'ai_ml',
 		/\b(machine learning|deep learning|neural net|llm|gpt|claude|gemini|openai|anthropic|transformer|fine.?tun|rag|retrieval augmented|embedding|diffusion|stable diffusion|midjourney|langchain|hugging ?face|training data|inference|token limit|prompt engineer|ai agent|rl(?:hf)?|lora|qlora|quantiz|bert|attention mechanism|chatbot|copilot|ai model|vision model|multimodal|generative ai)\b/i,
@@ -62,21 +32,12 @@ const KEYWORD_MAP: [DomainTag, RegExp][] = [
 ];
 
 /**
- * Tag a post by subreddit name (Reddit source).
- */
-export function tagBySubreddit(subreddit: string): DomainTag | null {
-	const normalized = subreddit.toLowerCase().replace(/^r\//, '');
-	return SUBREDDIT_MAP[normalized] || null;
-}
-
-/**
- * Tag a post by keyword matching (HN / RSS source).
+ * Tag a post by keyword matching.
  * Returns the best matching tag based on number of keyword hits.
  */
 export function tagByKeywords(title: string, snippet?: string | null): DomainTag | null {
 	const text = `${title} ${snippet || ''}`;
 
-	// Count matches per tag, pick the one with most hits
 	let bestTag: DomainTag | null = null;
 	let bestCount = 0;
 
@@ -93,19 +54,14 @@ export function tagByKeywords(title: string, snippet?: string | null): DomainTag
 
 /**
  * Get the domain tag for a post.
- * Reddit posts use subreddit mapping first, then fall back to keywords.
- * HN/RSS posts use keyword matching.
- * Falls back to 'backend' only as last resort — most untaggable HN posts are general tech.
+ * Uses keyword matching for all sources.
+ * Falls back to 'system_design' as last resort — general tech fallback.
  */
 export function getDomainTag(
-	source: string,
-	subreddit: string | null,
+	_source: string,
+	_subreddit: string | null,
 	title: string,
 	snippet?: string | null,
 ): DomainTag {
-	if (source === 'reddit' && subreddit) {
-		const tag = tagBySubreddit(subreddit);
-		if (tag) return tag;
-	}
-	return tagByKeywords(title, snippet) || 'system_design'; // general tech fallback
+	return tagByKeywords(title, snippet) || 'system_design';
 }

@@ -6,7 +6,6 @@ interface SourceBadgeProps {
 }
 
 const SOURCE_CONFIG: Record<Source, { label: string; color: string }> = {
-	reddit: { label: 'R', color: 'var(--color-source-reddit)' },
 	hn: { label: 'HN', color: 'var(--color-source-hn)' },
 	rss: { label: 'RSS', color: 'var(--color-source-rss)' },
 };

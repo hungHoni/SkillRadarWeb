@@ -2,7 +2,6 @@ import type { FastifyPluginAsync } from 'fastify';
 import { query } from '../db/client.js';
 import { scrapeHN } from '../scrapers/hn.js';
 import { scrapeRSS } from '../scrapers/rss.js';
-import { scrapeReddit } from '../scrapers/reddit.js';
 
 interface ScrapeResult {
 	source: string;
@@ -18,14 +17,13 @@ export const scrapeRoutes: FastifyPluginAsync = async (app) => {
 		if (reset === 'true') {
 			console.log('[Scrape] Resetting high-water marks...');
 			await query(
-				"UPDATE source_health SET last_scraped_id = NULL, last_scraped_at = NULL WHERE source IN ('hn', 'reddit', 'rss')",
+				"UPDATE source_health SET last_scraped_id = NULL, last_scraped_at = NULL WHERE source IN ('hn', 'rss')",
 			);
 		}
 
 		const scrapers = [
 			{ name: 'hn', fn: scrapeHN },
 			{ name: 'rss', fn: scrapeRSS },
-			{ name: 'reddit', fn: scrapeReddit },
 		];
 
 		const settled = await Promise.allSettled(scrapers.map((s) => s.fn()));

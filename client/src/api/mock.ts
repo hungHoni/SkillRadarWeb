@@ -17,9 +17,8 @@ const MOCK_CLUSTERS: ClusterSummary[] = [
 		source_count: 3,
 		mention_count: 347,
 		sources: [
-			{ name: 'reddit', count: 189, active: true },
 			{ name: 'hn', count: 142, active: true },
-			{ name: 'rss', count: 16, active: true },
+			{ name: 'rss', count: 63, active: true },
 		],
 		snippet:
 			'Anthropic releases Claude 4 Opus with significant improvements in multi-step reasoning, code generation, and long-context understanding. Early benchmarks show 12% improvement over GPT-5 on MMLU-Pro.',
@@ -35,8 +34,8 @@ const MOCK_CLUSTERS: ClusterSummary[] = [
 		source_count: 2,
 		mention_count: 128,
 		sources: [
-			{ name: 'reddit', count: 85, active: true },
-			{ name: 'hn', count: 43, active: true },
+			{ name: 'hn', count: 85, active: true },
+			{ name: 'rss', count: 43, active: true },
 		],
 		snippet:
 			'The Rust 2024 edition stabilizes async closures, gen blocks, and the new borrow checker. Community response overwhelmingly positive — "finally makes async Rust ergonomic."',
@@ -52,9 +51,8 @@ const MOCK_CLUSTERS: ClusterSummary[] = [
 		source_count: 3,
 		mention_count: 96,
 		sources: [
-			{ name: 'reddit', count: 41, active: true },
-			{ name: 'hn', count: 32, active: true },
-			{ name: 'rss', count: 23, active: true },
+			{ name: 'hn', count: 52, active: true },
+			{ name: 'rss', count: 44, active: true },
 		],
 		snippet:
 			'React 20 introduces composable server actions that eliminate the need for separate API route files. Dan Abramov demos a full CRUD app in a single component file.',
@@ -121,9 +119,8 @@ const MOCK_CLUSTERS: ClusterSummary[] = [
 		source_count: 3,
 		mention_count: 55,
 		sources: [
-			{ name: 'reddit', count: 22, active: true },
-			{ name: 'hn', count: 21, active: true },
-			{ name: 'rss', count: 12, active: true },
+			{ name: 'hn', count: 33, active: true },
+			{ name: 'rss', count: 22, active: true },
 		],
 		snippet:
 			'Bun 1.3 adds a native S3 client, doubles npm install speed, and introduces built-in SQLite migrations. Jarred Sumner: "We want Bun to be the only tool you need."',
@@ -139,7 +136,7 @@ const MOCK_CLUSTERS: ClusterSummary[] = [
 		source_count: 2,
 		mention_count: 41,
 		sources: [
-			{ name: 'reddit', count: 27, active: true },
+			{ name: 'hn', count: 27, active: true },
 			{ name: 'rss', count: 14, active: true },
 		],
 		snippet:
@@ -186,7 +183,7 @@ const MOCK_POSTS: Record<number, PostDetail[]> = {
 			id: 101,
 			title: 'Claude 4 Opus: First impressions and benchmark results',
 			url: 'https://example.com/claude-4-opus',
-			source: 'reddit',
+			source: 'hn',
 			score: 2847,
 			comment_count: 892,
 			author: 'ml_researcher_42',
@@ -218,7 +215,7 @@ const MOCK_POSTS: Record<number, PostDetail[]> = {
 			id: 201,
 			title: 'Rust 2024 Edition is here — async closures and gen blocks',
 			url: 'https://example.com/rust-2024',
-			source: 'reddit',
+			source: 'hn',
 			score: 1892,
 			comment_count: 445,
 			author: 'rustacean_dev',
@@ -297,11 +294,6 @@ export function mockFetchRising(_limit = 10): Promise<RisingResponse> {
 export function mockFetchSourcesHealth(): Promise<SourcesHealthResponse> {
 	return delay({
 		sources: [
-			{
-				name: 'reddit',
-				status: 'healthy',
-				last_scrape: new Date(Date.now() - 2 * 60 * 1000).toISOString(),
-			},
 			{
 				name: 'hn',
 				status: 'healthy',

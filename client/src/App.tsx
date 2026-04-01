@@ -180,7 +180,7 @@ export function App() {
 			acc[c.domain_tag] = (acc[c.domain_tag] || 0) + 1;
 			return acc;
 		},
-		{ all: 0, ai_ml: 0, backend: 0, frontend: 0, cloud_devops: 0, system_design: 0 } as Record<
+		{ all: 0, breaking_news: 0, ai_ml: 0, backend: 0, frontend: 0, cloud_devops: 0, system_design: 0 } as Record<
 			DomainTag | 'all',
 			number
 		>,
@@ -213,6 +213,7 @@ export function App() {
 					// Cycle domains
 					const domains: (DomainTag | 'all')[] = [
 						'all',
+						'breaking_news',
 						'ai_ml',
 						'backend',
 						'frontend',

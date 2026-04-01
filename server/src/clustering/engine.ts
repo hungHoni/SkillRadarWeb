@@ -17,7 +17,6 @@ interface RawPost {
 	author: string | null;
 	score: number;
 	comment_count: number;
-	subreddit: string | null;
 	created_at: string;
 }
 
@@ -49,7 +48,7 @@ export async function processPosts(posts: RawPost[]): Promise<number> {
 	// Step 2: Domain tagging
 	const taggedPosts = postsToEmbed.map((post) => ({
 		...post,
-		domain_tag: getDomainTag(post.source, post.subreddit, post.title, post.snippet),
+		domain_tag: getDomainTag(post.source, null, post.title, post.snippet),
 	}));
 
 	// Step 3: Generate embeddings in batch
@@ -70,8 +69,8 @@ export async function processPosts(posts: RawPost[]): Promise<number> {
 
 		// Insert post
 		const insertResult = await query(
-			`INSERT INTO posts (source, source_id, title, snippet, url, author, score, comment_count, subreddit, domain_tag, embedding, created_at)
-			 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+			`INSERT INTO posts (source, source_id, title, snippet, url, author, score, comment_count, domain_tag, embedding, created_at)
+			 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
 			 ON CONFLICT (source, source_id) DO NOTHING
 			 RETURNING id`,
 			[
@@ -83,7 +82,6 @@ export async function processPosts(posts: RawPost[]): Promise<number> {
 				post.author,
 				post.score,
 				post.comment_count,
-				post.subreddit,
 				post.domain_tag,
 				embeddingStr,
 				post.created_at,
@@ -181,7 +179,7 @@ export async function processPosts(posts: RawPost[]): Promise<number> {
 					title: post.title,
 					domain_tag: post.domain_tag,
 					heat_score: computeHeat(1, 1, 0),
-					sources: [{ name: post.source as 'reddit' | 'hn' | 'rss', count: 1, active: true }],
+					sources: [{ name: post.source as 'hn' | 'rss', count: 1, active: true }],
 				},
 			});
 		}

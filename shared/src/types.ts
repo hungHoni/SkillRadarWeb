@@ -1,5 +1,11 @@
 // Domain tags for categorizing posts and clusters
-export type DomainTag = 'ai_ml' | 'backend' | 'frontend' | 'cloud_devops' | 'system_design';
+export type DomainTag =
+	| 'ai_ml'
+	| 'backend'
+	| 'frontend'
+	| 'cloud_devops'
+	| 'system_design'
+	| 'breaking_news';
 
 export const DOMAIN_LABELS: Record<DomainTag | 'all', string> = {
 	all: 'All',
@@ -8,10 +14,11 @@ export const DOMAIN_LABELS: Record<DomainTag | 'all', string> = {
 	frontend: 'Frontend',
 	cloud_devops: 'Cloud/DevOps',
 	system_design: 'System Design',
+	breaking_news: 'Breaking News',
 };
 
 // Source types
-export type Source = 'reddit' | 'hn' | 'rss';
+export type Source = 'hn' | 'rss';
 
 export type SourceStatus = 'healthy' | 'degraded' | 'down';
 

@@ -1,7 +1,6 @@
 import cron from 'node-cron';
 import { deactivateStale, mergeClusters, recalculateCentroids } from '../clustering/engine.js';
 import { scrapeHN } from './hn.js';
-import { scrapeReddit } from './reddit.js';
 import { scrapeRSS } from './rss.js';
 
 export function startScheduler(): void {
@@ -9,24 +8,15 @@ export function startScheduler(): void {
 	setTimeout(async () => {
 		console.log('[Scheduler] Running initial scrape on startup...');
 		try {
-			await Promise.allSettled([scrapeHN(), scrapeRSS(), scrapeReddit()]);
+			await Promise.allSettled([scrapeHN(), scrapeRSS()]);
 			console.log('[Scheduler] Initial scrape complete');
 		} catch (err) {
 			console.error('[Scheduler] Initial scrape failed:', err);
 		}
 	}, 10_000);
 
-	// Reddit: every 10 minutes
+	// HN: every 10 minutes
 	cron.schedule('*/10 * * * *', async () => {
-		try {
-			await scrapeReddit();
-		} catch (err) {
-			console.error('[Scheduler] Reddit scrape failed:', err);
-		}
-	});
-
-	// HN: every 10 minutes (offset by 5 min from Reddit)
-	cron.schedule('5-55/10 * * * *', async () => {
 		try {
 			await scrapeHN();
 		} catch (err) {
@@ -34,8 +24,8 @@ export function startScheduler(): void {
 		}
 	});
 
-	// RSS: every 30 minutes
-	cron.schedule('*/30 * * * *', async () => {
+	// RSS: every 15 minutes (more feeds now, run more frequently)
+	cron.schedule('*/15 * * * *', async () => {
 		try {
 			await scrapeRSS();
 		} catch (err) {

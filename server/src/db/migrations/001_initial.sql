@@ -12,7 +12,6 @@ CREATE TABLE IF NOT EXISTS posts (
   author        TEXT,
   score         INT DEFAULT 0,
   comment_count INT DEFAULT 0,
-  subreddit     TEXT,
   domain_tag    TEXT,
   embedding     vector(1536),
   created_at    TIMESTAMPTZ NOT NULL,
@@ -58,6 +57,5 @@ CREATE INDEX IF NOT EXISTS idx_posts_scraped ON posts (scraped_at DESC);
 CREATE INDEX IF NOT EXISTS idx_posts_url ON posts (url) WHERE url IS NOT NULL;
 
 -- Seed source health rows
-INSERT INTO source_health (source, status) VALUES ('reddit', 'healthy') ON CONFLICT DO NOTHING;
 INSERT INTO source_health (source, status) VALUES ('hn', 'healthy') ON CONFLICT DO NOTHING;
 INSERT INTO source_health (source, status) VALUES ('rss', 'healthy') ON CONFLICT DO NOTHING;
