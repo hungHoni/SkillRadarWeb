@@ -33,28 +33,34 @@ describe('computeHeat', () => {
 });
 
 describe('getHeatLevel', () => {
+	// Thresholds: <1 → 1, >=1 → 2, >=2 → 3, >=3.5 → 4, >=5 → 5
 	it('returns 1 for low scores', () => {
 		expect(getHeatLevel(0)).toBe(1);
-		expect(getHeatLevel(4)).toBe(1);
+		expect(getHeatLevel(0.5)).toBe(1);
+		expect(getHeatLevel(0.99)).toBe(1);
 	});
 
 	it('returns 2 for medium-low scores', () => {
-		expect(getHeatLevel(5)).toBe(2);
-		expect(getHeatLevel(14)).toBe(2);
+		expect(getHeatLevel(1)).toBe(2);
+		expect(getHeatLevel(1.5)).toBe(2);
+		expect(getHeatLevel(1.99)).toBe(2);
 	});
 
 	it('returns 3 for medium scores', () => {
-		expect(getHeatLevel(15)).toBe(3);
-		expect(getHeatLevel(39)).toBe(3);
+		expect(getHeatLevel(2)).toBe(3);
+		expect(getHeatLevel(3)).toBe(3);
+		expect(getHeatLevel(3.49)).toBe(3);
 	});
 
 	it('returns 4 for high scores', () => {
-		expect(getHeatLevel(40)).toBe(4);
-		expect(getHeatLevel(79)).toBe(4);
+		expect(getHeatLevel(3.5)).toBe(4);
+		expect(getHeatLevel(4)).toBe(4);
+		expect(getHeatLevel(4.99)).toBe(4);
 	});
 
 	it('returns 5 for very high scores', () => {
-		expect(getHeatLevel(80)).toBe(5);
+		expect(getHeatLevel(5)).toBe(5);
+		expect(getHeatLevel(10)).toBe(5);
 		expect(getHeatLevel(200)).toBe(5);
 	});
 });
