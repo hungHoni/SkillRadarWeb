@@ -10,18 +10,20 @@ export const risingRoutes: FastifyPluginAsync = async (app) => {
 		// We approximate by looking at recently updated clusters with high heat
 		// that were first seen recently (strong recency signal)
 		const result = await query(
-			`SELECT id as cluster_id, title, domain_tag, heat_score,
+			`SELECT id as cluster_id, title, domain_tag, heat_score, mention_count, source_count,
 				CASE
-					WHEN first_seen > NOW() - INTERVAL '2 hours' THEN 999
-					ELSE ROUND((heat_score / GREATEST(
+					WHEN first_seen > NOW() - INTERVAL '2 hours' THEN -1
+					ELSE LEAST(ROUND((heat_score / GREATEST(
 						(SELECT heat_score FROM clusters c2
 						 WHERE c2.id = clusters.id), 0.01
-					) - 1) * 100)
+					) - 1) * 100), 500)
 				END as pct_change
 			 FROM clusters
 			 WHERE is_active = TRUE
-				AND last_updated > NOW() - INTERVAL '2 hours'
-			 ORDER BY heat_score DESC
+				AND last_updated > NOW() - INTERVAL '4 hours'
+			 ORDER BY
+				CASE WHEN mention_count > 1 THEN 0 ELSE 1 END,
+				heat_score DESC
 			 LIMIT $1`,
 			[limit],
 		);

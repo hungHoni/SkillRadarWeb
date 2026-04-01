@@ -41,23 +41,23 @@ const SUBREDDIT_MAP: Record<string, DomainTag> = {
 const KEYWORD_MAP: [DomainTag, RegExp][] = [
 	[
 		'ai_ml',
-		/\b(machine learning|deep learning|neural net|llm|gpt|claude|gemini|transformer|fine.?tun|rag|retrieval augmented|embedding|diffusion|stable diffusion|midjourney|langchain|hugging ?face|training|inference|token|prompt|agent|rl(?:hf)?|lora|qlora|quantiz|bert|attention)\b/i,
-	],
-	[
-		'backend',
-		/\b(api|rest(?:ful)?|grpc|graphql|database|postgres|mysql|mongo|redis|microservice|server|scaling|queue|cache|auth(?:entication)?|oauth|jwt|middleware|orm|prisma|drizzle|sql|nosql)\b/i,
+		/\b(machine learning|deep learning|neural net|llm|gpt|claude|gemini|openai|anthropic|transformer|fine.?tun|rag|retrieval augmented|embedding|diffusion|stable diffusion|midjourney|langchain|hugging ?face|training data|inference|token limit|prompt engineer|ai agent|rl(?:hf)?|lora|qlora|quantiz|bert|attention mechanism|chatbot|copilot|ai model|vision model|multimodal|generative ai)\b/i,
 	],
 	[
 		'frontend',
-		/\b(react|vue|svelte|angular|next\.?js|nuxt|css|tailwind|animation|component|responsive|accessibility|a11y|design system|webpack|vite|bundler|dom|browser|ui\/ux|figma)\b/i,
+		/\b(react|vue|svelte|angular|next\.?js|nuxt|css|tailwind|animation|ui component|responsive|accessibility|a11y|design system|webpack|vite|bundler|dom|browser api|ui\/ux|figma|web component)\b/i,
 	],
 	[
 		'cloud_devops',
-		/\b(kubernetes|k8s|docker|container|ci\/cd|deploy|aws|gcp|azure|infrastructure|monitoring|observability|terraform|helm|istio|service mesh|load balanc|cdn|cloudflare|vercel|railway|fly\.io)\b/i,
+		/\b(kubernetes|k8s|docker|container|ci\/cd|deploy(?:ment)?|aws|gcp|azure|infrastructure|monitoring|observability|terraform|helm|istio|service mesh|load balanc|cdn|cloudflare|vercel|railway|fly\.io|devops|sre|incident)\b/i,
 	],
 	[
 		'system_design',
-		/\b(architecture|distributed|sharding|replication|cap theorem|consensus|raft|paxos|event.?driven|cqrs|event.?sourc|saga|circuit.?break|rate.?limit|system design|interview|leetcode|scalab)\b/i,
+		/\b(architecture|distributed system|sharding|replication|cap theorem|consensus|raft|paxos|event.?driven|cqrs|event.?sourc|saga pattern|circuit.?break|rate.?limit|system design|scalab|microservice|high availability)\b/i,
+	],
+	[
+		'backend',
+		/\b(api design|rest(?:ful) api|grpc|graphql|database|postgres|mysql|mongo|redis|server.?side|queue|caching layer|oauth|jwt|middleware|orm|prisma|drizzle|sql query|nosql|golang|rust lang|python|java|node\.?js|express|fastify|django|flask|spring boot)\b/i,
 	],
 ];
 
@@ -71,19 +71,31 @@ export function tagBySubreddit(subreddit: string): DomainTag | null {
 
 /**
  * Tag a post by keyword matching (HN / RSS source).
+ * Returns the best matching tag based on number of keyword hits.
  */
 export function tagByKeywords(title: string, snippet?: string | null): DomainTag | null {
 	const text = `${title} ${snippet || ''}`;
+
+	// Count matches per tag, pick the one with most hits
+	let bestTag: DomainTag | null = null;
+	let bestCount = 0;
+
 	for (const [tag, regex] of KEYWORD_MAP) {
-		if (regex.test(text)) return tag;
+		const matches = text.match(new RegExp(regex.source, 'gi'));
+		if (matches && matches.length > bestCount) {
+			bestCount = matches.length;
+			bestTag = tag;
+		}
 	}
-	return null;
+
+	return bestTag;
 }
 
 /**
  * Get the domain tag for a post.
  * Reddit posts use subreddit mapping first, then fall back to keywords.
  * HN/RSS posts use keyword matching.
+ * Falls back to 'backend' only as last resort — most untaggable HN posts are general tech.
  */
 export function getDomainTag(
 	source: string,
@@ -95,5 +107,5 @@ export function getDomainTag(
 		const tag = tagBySubreddit(subreddit);
 		if (tag) return tag;
 	}
-	return tagByKeywords(title, snippet) || 'backend'; // fallback
+	return tagByKeywords(title, snippet) || 'system_design'; // general tech fallback
 }

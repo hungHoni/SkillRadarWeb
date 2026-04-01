@@ -40,7 +40,7 @@ export function RisingSidebar({ topics, onTopicClick }: RisingSidebarProps) {
 								animate={{ opacity: 1 }}
 								transition={{ delay: i * 0.1 }}
 							>
-								+{Math.round(topic.pct_change)}%
+								{topic.pct_change < 0 ? 'NEW' : `+${Math.round(topic.pct_change)}%`}
 							</motion.span>
 						</button>
 					</li>
