@@ -17,7 +17,8 @@ function getCorsOrigin(requestOrigin: string | undefined): string | null {
 	if (allowed === true) return requestOrigin || '*';
 	if (allowed === false || !allowed) return null;
 	if (typeof allowed === 'string') return allowed;
-	if (Array.isArray(allowed) && requestOrigin && allowed.includes(requestOrigin)) return requestOrigin;
+	if (Array.isArray(allowed) && requestOrigin && allowed.includes(requestOrigin))
+		return requestOrigin;
 	return null;
 }
 
