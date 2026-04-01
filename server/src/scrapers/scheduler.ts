@@ -5,6 +5,17 @@ import { scrapeReddit } from './reddit.js';
 import { scrapeRSS } from './rss.js';
 
 export function startScheduler(): void {
+	// Run an immediate scrape on startup (after 10s delay to let DB settle)
+	setTimeout(async () => {
+		console.log('[Scheduler] Running initial scrape on startup...');
+		try {
+			await Promise.allSettled([scrapeHN(), scrapeRSS(), scrapeReddit()]);
+			console.log('[Scheduler] Initial scrape complete');
+		} catch (err) {
+			console.error('[Scheduler] Initial scrape failed:', err);
+		}
+	}, 10_000);
+
 	// Reddit: every 10 minutes
 	cron.schedule('*/10 * * * *', async () => {
 		try {

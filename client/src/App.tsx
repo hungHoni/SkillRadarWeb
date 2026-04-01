@@ -83,6 +83,21 @@ export function App() {
 		loadData();
 	}, [loadData]);
 
+	// Auto-refresh when user returns to the tab (if data is older than 2 min)
+	useEffect(() => {
+		const handleVisibility = () => {
+			if (document.visibilityState === 'visible' && lastUpdated) {
+				const staleMs = Date.now() - lastUpdated.getTime();
+				if (staleMs > 2 * 60 * 1000) {
+					console.log('[App] Tab visible, data stale — refreshing');
+					loadData();
+				}
+			}
+		};
+		document.addEventListener('visibilitychange', handleVisibility);
+		return () => document.removeEventListener('visibilitychange', handleVisibility);
+	}, [loadData, lastUpdated]);
+
 	const handleRefresh = useCallback(async () => {
 		await triggerScrape();
 		await loadData();
