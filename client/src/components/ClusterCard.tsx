@@ -15,6 +15,7 @@ interface ClusterCardProps {
 	isFocused: boolean;
 	isHighlighted: boolean;
 	heatPulse: boolean;
+	animateEntrance?: boolean;
 }
 
 export function ClusterCard({
@@ -23,6 +24,7 @@ export function ClusterCard({
 	isFocused,
 	isHighlighted,
 	heatPulse,
+	animateEntrance = true,
 }: ClusterCardProps) {
 	const [expanded, setExpanded] = useState(false);
 	const [posts, setPosts] = useState<PostDetail[] | null>(null);
@@ -50,9 +52,11 @@ export function ClusterCard({
 			aria-label={`${cluster.title}, heat level ${cluster.heat_level} of 5, ${cluster.mention_count} mentions across ${cluster.source_count} sources`}
 			aria-expanded={expanded}
 			tabIndex={-1}
-			initial={{ opacity: 0, y: 8 }}
+			initial={animateEntrance ? { opacity: 0, y: 8 } : false}
 			animate={{ opacity: 1, y: 0 }}
-			transition={{ duration: 0.3, ease: 'easeOut', delay: index * 0.08 }}
+			transition={
+				animateEntrance ? { duration: 0.3, ease: 'easeOut', delay: index * 0.08 } : { duration: 0 }
+			}
 			data-cluster-id={cluster.id}
 			className={`rounded-lg border bg-[var(--color-bg-card)] p-5 transition-shadow ${
 				isFocused ? 'ring-2 ring-[var(--color-accent)]/50' : 'border-[var(--color-border)]'

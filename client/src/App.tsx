@@ -35,6 +35,7 @@ export function App() {
 	const [heatPulseIds, setHeatPulseIds] = useState<Set<number>>(new Set());
 
 	const mainRef = useRef<HTMLElement>(null);
+	const isInitialLoad = useRef(true);
 
 	// URL state sync
 	useEffect(() => {
@@ -61,7 +62,7 @@ export function App() {
 	const loadData = useCallback(async () => {
 		try {
 			const [trendsRes, risingRes, sourcesRes] = await Promise.all([
-				fetchTrends('all', 50),
+				fetchTrends('all', 200),
 				fetchRising(10),
 				fetchSourcesHealth(),
 			]);
@@ -72,6 +73,7 @@ export function App() {
 			setRisingState('loaded');
 			setSourcesState('loaded');
 			setLastUpdated(new Date());
+			isInitialLoad.current = false;
 		} catch {
 			setTrendsState((s) => (s === 'loading' ? 'error' : s));
 			setRisingState((s) => (s === 'loading' ? 'error' : s));
@@ -355,6 +357,7 @@ export function App() {
 									isFocused={focusIndex === i}
 									isHighlighted={highlightedId === cluster.id}
 									heatPulse={heatPulseIds.has(cluster.id)}
+									animateEntrance={isInitialLoad.current}
 								/>
 							))}
 						</div>
