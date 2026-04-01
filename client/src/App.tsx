@@ -180,10 +180,15 @@ export function App() {
 			acc[c.domain_tag] = (acc[c.domain_tag] || 0) + 1;
 			return acc;
 		},
-		{ all: 0, breaking_news: 0, ai_ml: 0, backend: 0, frontend: 0, cloud_devops: 0, system_design: 0 } as Record<
-			DomainTag | 'all',
-			number
-		>,
+		{
+			all: 0,
+			breaking_news: 0,
+			ai_ml: 0,
+			backend: 0,
+			frontend: 0,
+			cloud_devops: 0,
+			system_design: 0,
+		} as Record<DomainTag | 'all', number>,
 	);
 
 	// Keyboard shortcuts

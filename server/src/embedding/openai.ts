@@ -30,9 +30,10 @@ export async function generateEmbeddings(texts: string[]): Promise<(number[] | n
 			for (const item of response.data) {
 				results[i + item.index] = item.embedding;
 			}
-		} catch (err: any) {
-			const msg = err?.message || err;
-			const status = err?.status || err?.response?.status;
+		} catch (err: unknown) {
+			const e = err as Record<string, unknown>;
+			const msg = e?.message || err;
+			const status = e?.status || (e?.response as Record<string, unknown>)?.status;
 			console.error(`[Embedding] Batch failed (offset ${i}): status=${status} message=${msg}`);
 			if (status === 401) {
 				console.error('[Embedding] 401 Unauthorized — OPENAI_API_KEY is invalid or not set');
